@@ -6,19 +6,19 @@ import java.util.Objects;
 
 public class Record {
 
-	private final List<ValueAttribute> attributes;
-	private final ClassAttribute clazz;
+	private final List<Object> values;
+	private final String clazz;
 
-	public Record(final List<ValueAttribute> attributes, final ClassAttribute clazz) {
-		this.attributes = Collections.unmodifiableList(Objects.requireNonNull(attributes));
+	public Record(final List<Object> values, final String clazz) {
+		this.values = Collections.unmodifiableList(Objects.requireNonNull(values));
 		this.clazz = Objects.requireNonNull(clazz);
 	}
 
-	public List<ValueAttribute> getAttributes() {
-		return attributes;
+	public List<Object> getValues() {
+		return values;
 	}
 
-	public ClassAttribute getClazz() {
+	public String getClazz() {
 		return clazz;
 	}
 

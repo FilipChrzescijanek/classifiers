@@ -12,19 +12,4 @@ public abstract class Attribute {
 		return name;
 	}
 
-	@Override
-	public boolean equals(final Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Attribute)) return false;
-
-		final Attribute attribute = (Attribute) o;
-
-		return getName().equals(attribute.getName());
-
-	}
-
-	@Override
-	public int hashCode() {
-		return getName().hashCode();
-	}
 }

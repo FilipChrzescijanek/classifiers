@@ -6,17 +6,17 @@ import java.util.Optional;
 
 public class TestRecord extends Record {
 
-	private ClassAttribute assignedClazz;
+	private String assignedClazz;
 
-	public TestRecord(final List<ValueAttribute> attributes, final ClassAttribute clazz) {
-		super(attributes, clazz);
+	public TestRecord(final List<Object> values, final String clazz) {
+		super(values, clazz);
 	}
 
-	public ClassAttribute getAssignedClazz() {
-		return Optional.ofNullable(assignedClazz).orElse(new NullClassAttribute());
+	public String getAssignedClazz() {
+		return Optional.ofNullable(assignedClazz).orElse("null");
 	}
 
-	public void setAssignedClazz(final ClassAttribute assignedClazz) {
+	public void setAssignedClazz(final String assignedClazz) {
 		this.assignedClazz = Objects.requireNonNull(assignedClazz);
 	}
 

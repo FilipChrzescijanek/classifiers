@@ -2,6 +2,7 @@ package pwr.chrzescijanek.filip.ml.classifier;
 
 import org.junit.Test;
 import pwr.chrzescijanek.filip.ml.data.DataSource;
+import pwr.chrzescijanek.filip.ml.data.RangeDiscretizer;
 
 import java.io.IOException;
 
@@ -29,7 +30,7 @@ public class ClassifierTest {
 		final Integer CLASS_INDEX = 4;
 		final Integer FOLDS = 10;
 
-		checkResults(c.crossValidate(new DataSource(dataSet, CLASS_INDEX).asDataSet(), FOLDS));
+		checkResults(c.crossValidate(new DataSource(dataSet, CLASS_INDEX).asDataSet(new RangeDiscretizer()), FOLDS));
 	}
 
 	private void checkResults(final Eval e) {
