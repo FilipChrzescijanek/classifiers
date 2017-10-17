@@ -10,35 +10,20 @@ import java.util.stream.Collectors;
 
 public class DataSet {
 
-	private final List<? extends Record> records;
+	private final List<Record> records;
 	private final List<? extends DataAttribute> attributes;
 	private final DiscreteAttribute clazz;
 
-	public DataSet(final List<? extends Record> records, List<String> attributeNames, List<String> attributeTypes, 
+	public DataSet(final List<Record> records, List<String> attributeNames, List<String> attributeTypes, 
 			final String className) {
 		final List<String> classValues = records.stream().map(r -> r.getClazz()).collect(Collectors.toList());
-		this.clazz = new DiscreteAttribute(className, classValues);
 		
-		List<DataAttribute> attributes = new ArrayList<>();
-		
-		for (int i = 0; i < attributeNames.size(); i++) {
-			final int index = i;
-			if (attributeTypes.get(i).equals("c")) {
-				final List<Double> values = records.stream().map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());      
-				attributes.add(new ContinuousAttribute(attributeNames.get(i), values));
-			} else if (attributeTypes.get(i).equals("d")) {
-				final List<String> values = records.stream().map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
-				attributes.add(new DiscreteAttribute(attributeNames.get(i), values));
-			} else {
-				throw new UnknownFormatConversionException("Unknown attribute type" + attributeTypes.get(i));
-			}
-		}
-		
+		this.clazz = new DiscreteAttribute(className, classValues);		
 		this.records = Collections.unmodifiableList(Objects.requireNonNull(records));
-		this.attributes = Collections.unmodifiableList(Objects.requireNonNull(attributes));
+		this.attributes = Collections.unmodifiableList(Objects.requireNonNull(createAttributes(records, attributeNames, attributeTypes)));
 	}
 
-	public List<? extends Record> getRecords() {
+	public List<Record> getRecords() {
 		return records;
 	}
 
@@ -46,24 +31,32 @@ public class DataSet {
 		return attributes;
 	}
 	
+	public List<String> getAttributeNames() {
+		return getAttributes().stream().map(a -> a.getName()).collect(Collectors.toList());
+	}
+	
+	public DataAttribute getAttributeByName(String name) {
+		return getAttributes().stream().filter(a -> a.getName().equals(name)).findFirst().get();
+	}
+	
 	public List<Double> getValues(ContinuousAttribute attribute) {
 		final int index = attributes.indexOf(attribute);
-		return records.stream().map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());
+		return getRecords().stream().map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());
 	}
 	
 	public List<Double> getValuesForClass(ContinuousAttribute attribute, String clazz) {
 		final int index = attributes.indexOf(attribute);
-		return records.stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());
+		return getRecords().stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());
 	}
 	
 	public List<String> getValues(DiscreteAttribute attribute) {
 		final int index = attributes.indexOf(attribute);
-		return records.stream().map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
+		return getRecords().stream().map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
 	}
 	
 	public List<String> getValuesForClass(DiscreteAttribute attribute, String clazz) {
 		final int index = attributes.indexOf(attribute);
-		return records.stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
+		return getRecords().stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
 	}
 
 	public DiscreteAttribute getClazz() {
@@ -72,6 +65,26 @@ public class DataSet {
 
 	public Iterator<Fold> foldIterator(final Integer folds) {
 		return new FoldIterator(folds);
+	}
+
+	private List<DataAttribute> createAttributes(final List<Record> records, List<String> attributeNames,
+			List<String> attributeTypes) {
+		List<DataAttribute> attributes = new ArrayList<>();
+		
+		for (int i = 0; i < attributeNames.size(); i++) {
+			final int index = i;
+			if ("c".equals(attributeTypes.get(i))) {
+				final List<Double> values = records.stream().map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());      
+				attributes.add(new ContinuousAttribute(attributeNames.get(i), values));
+			} else if ("d".equals(attributeTypes.get(i))) {
+				final List<String> values = records.stream().map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
+				attributes.add(new DiscreteAttribute(attributeNames.get(i), values));
+			} else {
+				throw new UnknownFormatConversionException("Unknown attribute type" + attributeTypes.get(i));
+			}
+		}
+	
+		return attributes;
 	}
 
 	private class FoldIterator implements Iterator<Fold> {
@@ -92,14 +105,21 @@ public class DataSet {
 		@Override
 		public Fold next() {
 			final Integer foldSize = (getRecords().size() + folds - 1) / folds;
-			final List<Record> copy = new ArrayList<>(getRecords());
-			final List<Record> test = new ArrayList<>(copy.subList(position * foldSize, (position + 1) * foldSize));
-			copy.removeAll(test);
-			final List<TestRecord> testSet = test.stream().map(r -> new TestRecord(r.getValues(), r.getClazz())).collect(Collectors.toList());
-			final Fold fold = new Fold(new DataSet(copy, 
-					getAttributes().stream().map(a -> a.getName()).collect(Collectors.toList()), 
-					getAttributes().stream().map(a -> a.isDiscrete() ? "d" : "c").collect(Collectors.toList()), 
-					getClazz().getName()), new TestDataSet(testSet, getClazz()));
+			
+			List<String> attributeNames = getAttributeNames();
+			List<String> attributeTypes = getAttributes().stream().map(a -> a.isDiscrete() ? "d" : "c").collect(Collectors.toList());
+			
+			final List<Record> copy        = new ArrayList<>(getRecords());
+			final List<Record> testSublist = new ArrayList<>(copy.subList(position * foldSize, (position + 1) * foldSize));
+			
+			copy.removeAll(testSublist);
+			
+			final List<TestRecord> testSet = testSublist.stream().map(r -> new TestRecord(r.getValues(), attributeNames, r.getClazz())).collect(Collectors.toList());
+			
+			DataSet trainingDataSet = new DataSet(copy, attributeNames, attributeTypes, getClazz().getName());
+			TestDataSet testDataSet = new TestDataSet(testSet, getClazz().getValues());
+			
+			final Fold fold = new Fold(trainingDataSet, testDataSet);
 			position++;
 			return fold;
 		}

@@ -24,7 +24,7 @@ public abstract class AbstractClassifier implements Classifier {
 	@Override
 	public Eval test(final TestDataSet tds) {
 		Objects.requireNonNull(tds);
-		tds.getTestRecords().forEach(this::assignClass);
+		tds.getRecords().forEach(this::assignClass);
 		return new Eval(tds.getConfusionMatrix());
 	}
 

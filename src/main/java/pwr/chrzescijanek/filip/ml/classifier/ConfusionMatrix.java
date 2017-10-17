@@ -20,8 +20,8 @@ public class ConfusionMatrix {
 
 	public ConfusionMatrix(final List<ConfusionMatrix> matrices) {
 		Objects.requireNonNull(matrices);
-		this.truePositives = (int) matrices.stream().mapToInt(ConfusionMatrix::getTruePositives).average().orElse(0);
-		this.trueNegatives = (int) matrices.stream().mapToInt(ConfusionMatrix::getTrueNegatives).average().orElse(0);
+		this.truePositives  = (int) matrices.stream().mapToInt(ConfusionMatrix::getTruePositives ).average().orElse(0);
+		this.trueNegatives  = (int) matrices.stream().mapToInt(ConfusionMatrix::getTrueNegatives ).average().orElse(0);
 		this.falsePositives = (int) matrices.stream().mapToInt(ConfusionMatrix::getFalsePositives).average().orElse(0);
 		this.falseNegatives = (int) matrices.stream().mapToInt(ConfusionMatrix::getFalseNegatives).average().orElse(0);
 	}
@@ -40,6 +40,11 @@ public class ConfusionMatrix {
 
 	public Integer getFalseNegatives() {
 		return falseNegatives;
+	}
+	
+	@Override
+	public String toString() {
+		return "[" + truePositives + ", " + trueNegatives + ", " + falsePositives + ", " + falseNegatives + "]";
 	}
 
 }

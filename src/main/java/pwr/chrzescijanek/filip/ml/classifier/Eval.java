@@ -5,9 +5,9 @@ import java.util.Objects;
 
 public class Eval {
 
-	private final Double recall;
-	private final Double precision;
 	private final Double accuracy;
+	private final Double precision;
+	private final Double recall;
 	private final Double fscore;
 
 	public Eval(final ConfusionMatrix cm) {
@@ -25,9 +25,9 @@ public class Eval {
 
 	public Eval(final List<Eval> evals) {
 		Objects.requireNonNull(evals);
-		this.recall    = evals.stream().mapToDouble(Eval::getRecall).average().orElse(0.0);
-		this.precision = evals.stream().mapToDouble(Eval::getPrecision).average().orElse(0.0);
 		this.accuracy  = evals.stream().mapToDouble(Eval::getAccuracy).average().orElse(0.0);
+		this.precision = evals.stream().mapToDouble(Eval::getPrecision).average().orElse(0.0);
+		this.recall    = evals.stream().mapToDouble(Eval::getRecall).average().orElse(0.0);
 		this.fscore    = evals.stream().mapToDouble(Eval::getFscore).average().orElse(0.0);
 	}
 

@@ -26,34 +26,24 @@ public class DataSource {
 	}
 
 	public DataSet asDataSet(Discretizer discretizer) throws IOException {
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(uri)))) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(getUri())))) {
 			final List<String> lines = br.lines().filter(s -> !s.isEmpty()).collect(Collectors.toList());
+			
 			final List<String> attributeNames = new ArrayList<>(Arrays.asList(lines.remove(0).split(",")));
 			final List<String> attributeTypes = new ArrayList<>(Arrays.asList(lines.remove(0).split(",")));
-			final String className = attributeNames.remove(classIndex.intValue());
-			final String classType = attributeTypes.remove(classIndex.intValue());
-			assert(classType.equals("d"));
-			final List<List<String>> data = lines.stream().map(l -> new ArrayList<>(Arrays.asList(l.split(",")))).collect(Collectors.toList());
-			final List<String> classValues = new ArrayList<>();
-			data.forEach(row -> classValues.add(row.remove(classIndex.intValue())));
 			
-			final List<Record> records = new ArrayList<>();
-			for (int i = 0; i < data.size(); i++) {
-				final List<Object> values = new ArrayList<>();
-				final List<String> row = data.get(i);
-				for (int j = 0; j < row.size(); j++) {
-					if (attributeTypes.get(i).equals("c")) {
-						values.add(Double.parseDouble(row.get(j)));
-					} else if (attributeTypes.get(i).equals("d")) {
-						values.add(row.get(j));
-					} else {
-						throw new UnknownFormatConversionException("Unknown attribute type" + attributeTypes.get(i));
-					}
-				}
-				records.add(new Record(values, classValues.get(i)));
+			final String className = attributeNames.remove(getClassIndex().intValue());
+			final String classType = attributeTypes.remove(getClassIndex().intValue());
+			checkClassType(classType);
+			
+			final List<Record> records = processData(lines, attributeTypes);
+			
+			DataSet dataSet = new DataSet(records, attributeNames, attributeTypes, className);
+		
+			if (Objects.nonNull(discretizer)) {
+				return discretizer.discretize(dataSet);
 			}
-			
-			return new DataSet(records, attributeNames, attributeTypes, className);
+			return dataSet;	
 		}
 	}
 
@@ -63,6 +53,45 @@ public class DataSource {
 
 	public Integer getClassIndex() {
 		return classIndex;
+	}
+
+	private void checkClassType(final String classType) {
+		if (!"d".equals(classType)) {
+			throw new IllegalArgumentException("Class attribute must have discrete values!");
+		}
+	}
+
+	private List<Record> processData(final List<String> lines, final List<String> attributeTypes) {
+		final List<List<String>> data = lines
+				.stream()
+				.map(l -> new ArrayList<>(Arrays.asList(l.split(","))))
+				.collect(Collectors.toList());
+		
+		final List<String> classValues = new ArrayList<>();
+		data.forEach(row -> classValues.add(row.remove(getClassIndex().intValue())));
+		
+		final List<Record> records = createRecords(attributeTypes, data, classValues);
+		return records;
+	}
+
+	private List<Record> createRecords(final List<String> attributeTypes, final List<List<String>> data,
+			final List<String> classValues) {
+		final List<Record> records = new ArrayList<>();
+		for (int i = 0; i < data.size(); i++) {
+			final List<Object> values = new ArrayList<>();
+			final List<String> row = data.get(i);
+			for (int j = 0; j < row.size(); j++) {
+				if ("c".equals(attributeTypes.get(j))) {
+					values.add(Double.parseDouble(row.get(j)));
+				} else if ("d".equals(attributeTypes.get(j))) {
+					values.add(row.get(j));
+				} else {
+					throw new UnknownFormatConversionException("Unknown attribute type" + attributeTypes.get(i));
+				}
+			}
+			records.add(new Record(values, classValues.get(i)));
+		}
+		return records;
 	}
 
 }
