@@ -1,4 +1,4 @@
-package pwr.chrzescijanek.filip.ml.data;
+package pwr.chrzescijanek.filip.ml.data.discretizer;
 
 import java.util.Objects;
 

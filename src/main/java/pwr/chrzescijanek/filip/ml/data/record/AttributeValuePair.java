@@ -1,23 +1,23 @@
-package pwr.chrzescijanek.filip.ml.classifier;
+package pwr.chrzescijanek.filip.ml.data.record;
 
 import java.util.Objects;
 
-public class ClassAttributePair {
+public class AttributeValuePair {
 
-	private final String classValue;
 	private final String attributeName;
+	private final Object value;
 	
-	public ClassAttributePair(String classValue, String attributeName) {
-		this.classValue    = Objects.requireNonNull(classValue);
+	public AttributeValuePair(String attributeName, Object value) {
 		this.attributeName = Objects.requireNonNull(attributeName);
-	}
-	
-	public String getClassValue() {
-		return classValue;
+		this.value         = Objects.requireNonNull(value);
 	}
 	
 	public String getAttributeName() {
 		return attributeName;
+	}
+	
+	public Object getValue() {
+		return value;
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class ClassAttributePair {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((attributeName == null) ? 0 : attributeName.hashCode());
-		result = prime * result + ((classValue == null)    ? 0 : classValue.hashCode());
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
 
@@ -37,16 +37,16 @@ public class ClassAttributePair {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		ClassAttributePair other = (ClassAttributePair) obj;
+		AttributeValuePair other = (AttributeValuePair) obj;
 		if (attributeName == null) {
 			if (other.attributeName != null)
 				return false;
 		} else if (!attributeName.equals(other.attributeName))
 			return false;
-		if (classValue == null) {
-			if (other.classValue != null)
+		if (value == null) {
+			if (other.value != null)
 				return false;
-		} else if (!classValue.equals(other.classValue))
+		} else if (!value.equals(other.value))
 			return false;
 		return true;
 	}

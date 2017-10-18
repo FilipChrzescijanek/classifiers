@@ -3,7 +3,7 @@ package pwr.chrzescijanek.filip.ml.classifier;
 import pwr.chrzescijanek.filip.ml.data.DataSet;
 import pwr.chrzescijanek.filip.ml.data.Fold;
 import pwr.chrzescijanek.filip.ml.data.TestDataSet;
-import pwr.chrzescijanek.filip.ml.data.TestRecord;
+import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -1,4 +1,4 @@
-package pwr.chrzescijanek.filip.ml.classifier;
+package pwr.chrzescijanek.filip.ml.classifier.bayes.model;
 
 import java.util.List;
 import java.util.Map;

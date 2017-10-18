@@ -1,4 +1,4 @@
-package pwr.chrzescijanek.filip.ml.classifier;
+package pwr.chrzescijanek.filip.ml.classifier.bayes.model;
 
 public interface ProbabilityProvider {
 

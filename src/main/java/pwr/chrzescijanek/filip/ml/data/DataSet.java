@@ -8,6 +8,12 @@ import java.util.Objects;
 import java.util.UnknownFormatConversionException;
 import java.util.stream.Collectors;
 
+import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
+import pwr.chrzescijanek.filip.ml.data.attribute.DataAttribute;
+import pwr.chrzescijanek.filip.ml.data.attribute.DiscreteAttribute;
+import pwr.chrzescijanek.filip.ml.data.record.Record;
+import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
+
 public class DataSet {
 
 	private final List<Record> records;
@@ -57,6 +63,17 @@ public class DataSet {
 	public List<String> getValuesForClass(DiscreteAttribute attribute, String clazz) {
 		final int index = attributes.indexOf(attribute);
 		return getRecords().stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
+	}
+	
+	public Double getMean(ContinuousAttribute attribute, String clazz) {
+		return getValuesForClass(attribute, clazz).stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+	}
+	
+	public Double getStdDev(ContinuousAttribute attribute, String clazz) {
+		List<Double> values = getValuesForClass(attribute, clazz);
+		Double mean         = getMean(attribute, clazz);
+		
+		return Math.sqrt(values.stream().reduce(0.0, (a, b) -> a + Math.pow(b - mean, 2)) / (values.size() - 1));
 	}
 
 	public DiscreteAttribute getClazz() {

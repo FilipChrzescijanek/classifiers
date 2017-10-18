@@ -1,7 +1,8 @@
-package pwr.chrzescijanek.filip.ml.classifier;
+package pwr.chrzescijanek.filip.ml.classifier.knn;
 
+import pwr.chrzescijanek.filip.ml.classifier.AbstractClassifier;
 import pwr.chrzescijanek.filip.ml.data.DataSet;
-import pwr.chrzescijanek.filip.ml.data.TestRecord;
+import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 
 public class KNearestNeighbors extends AbstractClassifier {
 

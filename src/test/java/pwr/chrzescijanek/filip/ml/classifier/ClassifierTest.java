@@ -1,8 +1,14 @@
 package pwr.chrzescijanek.filip.ml.classifier;
 
 import org.junit.Test;
+
+import pwr.chrzescijanek.filip.ml.classifier.bayes.Bayes;
+import pwr.chrzescijanek.filip.ml.classifier.ila.InductiveLearning;
+import pwr.chrzescijanek.filip.ml.classifier.knn.KNearestNeighbors;
 import pwr.chrzescijanek.filip.ml.data.DataSource;
-import pwr.chrzescijanek.filip.ml.data.RangeDiscretizer;
+import pwr.chrzescijanek.filip.ml.data.discretizer.CardinalityDiscretizer;
+import pwr.chrzescijanek.filip.ml.data.discretizer.EntropyDiscretizer;
+import pwr.chrzescijanek.filip.ml.data.discretizer.RangeDiscretizer;
 
 import java.io.IOException;
 
@@ -26,11 +32,14 @@ public class ClassifierTest {
 	}
 
 	private void testCrossValidation(final Classifier c) throws IOException {
-		final String dataSet = "/iris.csv";
-		final Integer CLASS_INDEX = 4;
-		final Integer FOLDS = 10;
+		final Integer classIndex = 4;
+		final Integer folds      = 10;
+		final String dataSet     = "/iris.csv";
 
-		checkResults(c.crossValidate(new DataSource(dataSet, CLASS_INDEX).asDataSet(new RangeDiscretizer()), FOLDS));
+		checkResults(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(), folds));
+		checkResults(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new RangeDiscretizer()), folds));
+		checkResults(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new CardinalityDiscretizer()), folds));
+		checkResults(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new EntropyDiscretizer()), folds));
 	}
 
 	private void checkResults(final Eval e) {

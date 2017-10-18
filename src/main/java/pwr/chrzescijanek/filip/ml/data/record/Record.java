@@ -1,4 +1,4 @@
-package pwr.chrzescijanek.filip.ml.data;
+package pwr.chrzescijanek.filip.ml.data.record;
 
 import java.util.Collections;
 import java.util.List;

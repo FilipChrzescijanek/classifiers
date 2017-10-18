@@ -1,8 +1,12 @@
-package pwr.chrzescijanek.filip.ml.data;
+package pwr.chrzescijanek.filip.ml.data.discretizer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import pwr.chrzescijanek.filip.ml.data.DataSet;
+import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
+import pwr.chrzescijanek.filip.ml.data.record.Record;
 
 public abstract class AbstractDiscretizer implements Discretizer {
 
@@ -36,7 +40,7 @@ public abstract class AbstractDiscretizer implements Discretizer {
 			final int index = ds.getAttributes().indexOf(attribute);
 			
 			final List<Double> column    = ds.getValues(attribute);
-			final List<Bin> bins         = createBins(column);
+			final List<Bin> bins         = createBins(ds, column);
 			
 			final List<Bin> discretized  = column
 					.stream()
@@ -49,6 +53,6 @@ public abstract class AbstractDiscretizer implements Discretizer {
 		}
 	}
 	
-	protected abstract List<Bin> createBins(List<Double> column);
+	protected abstract List<Bin> createBins(DataSet ds, List<Double> column);
 
 }

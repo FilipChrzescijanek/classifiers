@@ -1,4 +1,4 @@
-package pwr.chrzescijanek.filip.ml.data;
+package pwr.chrzescijanek.filip.ml.data.record;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import pwr.chrzescijanek.filip.ml.classifier.AttributeValuePair;
 import pwr.chrzescijanek.filip.ml.classifier.Classifier;
 
 public class TestRecord {

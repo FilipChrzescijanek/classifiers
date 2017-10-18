@@ -2,6 +2,7 @@ package pwr.chrzescijanek.filip.ml.data;
 
 import pwr.chrzescijanek.filip.ml.classifier.Classifier;
 import pwr.chrzescijanek.filip.ml.classifier.ConfusionMatrix;
+import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 
 import java.util.ArrayList;
 import java.util.Collections;

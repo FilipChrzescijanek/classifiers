@@ -10,6 +10,9 @@ import java.util.Objects;
 import java.util.UnknownFormatConversionException;
 import java.util.stream.Collectors;
 
+import pwr.chrzescijanek.filip.ml.data.discretizer.Discretizer;
+import pwr.chrzescijanek.filip.ml.data.record.Record;
+
 public class DataSource {
 
 	private final String uri;
