@@ -127,7 +127,7 @@ public class DataSet {
 			List<String> attributeTypes = getAttributes().stream().map(a -> a.isDiscrete() ? "d" : "c").collect(Collectors.toList());
 			
 			final List<Record> copy        = new ArrayList<>(getRecords());
-			final List<Record> testSublist = new ArrayList<>(copy.subList(position * foldSize, (position + 1) * foldSize));
+			final List<Record> testSublist = new ArrayList<>(copy.subList(position * foldSize, Math.min((position + 1) * foldSize, copy.size())));
 			
 			copy.removeAll(testSublist);
 			

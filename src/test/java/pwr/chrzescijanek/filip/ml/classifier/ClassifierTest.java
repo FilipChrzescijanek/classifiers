@@ -31,9 +31,9 @@ public class ClassifierTest {
 	}
 
 	private void testCrossValidation(final Classifier c) throws IOException {
-		final Integer classIndex = 4;
+		final Integer classIndex = 0;
 		final Integer folds      = 10;
-		final String dataSet     = "/iris.csv";
+		final String dataSet     = getClass().getResource("/iris.csv").getPath();
 
 		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(), folds));
 		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new RangeDiscretizer()), folds));

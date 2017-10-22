@@ -1,6 +1,7 @@
 package pwr.chrzescijanek.filip.ml.data;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -28,12 +29,12 @@ public class DataSource {
 		return asDataSet(null);
 	}
 
-	public DataSet asDataSet(Discretizer discretizer) throws IOException {
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(getUri())))) {
+	public DataSet asDataSet(final Discretizer discretizer) throws IOException {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(getUri())))) {
 			final List<String> lines = br.lines().filter(s -> !s.isEmpty()).collect(Collectors.toList());
 			
-			final List<String> attributeNames = new ArrayList<>(Arrays.asList(lines.remove(0).split(",")));
-			final List<String> attributeTypes = new ArrayList<>(Arrays.asList(lines.remove(0).split(",")));
+			final List<String> attributeNames = new ArrayList<>(Arrays.asList(lines.remove(0).split("\\s*,\\s*")));
+			final List<String> attributeTypes = new ArrayList<>(Arrays.asList(lines.remove(0).split("\\s*,\\s*")));
 			
 			final String className = attributeNames.remove(getClassIndex().intValue());
 			final String classType = attributeTypes.remove(getClassIndex().intValue());
@@ -41,7 +42,7 @@ public class DataSource {
 			
 			final List<Record> records = processData(lines, attributeTypes);
 			
-			DataSet dataSet = new DataSet(records, attributeNames, attributeTypes, className);
+			final DataSet dataSet = new DataSet(records, attributeNames, attributeTypes, className);
 		
 			if (Objects.nonNull(discretizer)) {
 				return discretizer.discretize(dataSet);
@@ -67,7 +68,7 @@ public class DataSource {
 	private List<Record> processData(final List<String> lines, final List<String> attributeTypes) {
 		final List<List<String>> data = lines
 				.stream()
-				.map(l -> new ArrayList<>(Arrays.asList(l.split(","))))
+				.map(l -> new ArrayList<>(Arrays.asList(l.split("\\s*,\\s*"))))
 				.collect(Collectors.toList());
 		
 		final List<String> classValues = new ArrayList<>();

@@ -22,8 +22,8 @@ public class CardinalityDiscretizer extends AbstractDiscretizer {
 		for (int j = 0; j < noOfBins; j++) {
 			final Integer minIndex = separation * j;
 			final Integer maxIndex = separation * (j + 1) - 1;
-			final Double minValue = minIndex == 0        ? min.doubleValue() : bins.get(j - 1).getMaxValue();
-			final Double maxValue = maxIndex >= size - 1 ? max.doubleValue() : sorted.get(maxIndex);
+			final Double minValue  = minIndex == 0        ? min.doubleValue() : bins.get(j - 1).getMaxValue();
+			final Double maxValue  = maxIndex >= size - 1 ? max.doubleValue() : sorted.get(maxIndex);
 			bins.add(new Bin(minValue, maxValue));
 		}
 		
