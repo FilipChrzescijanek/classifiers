@@ -1,21 +1,26 @@
 package pwr.chrzescijanek.filip.ml.classifier;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Eval {
+
+	private final List<ConfusionMatrix> matrices;
 
 	private final Double accuracy;
 	private final Double precision;
 	private final Double recall;
 	private final Double fscore;
 
-	public Eval(final ConfusionMatrix cm) {
-		Objects.requireNonNull(cm);
-		final Integer tp = cm.getTruePositives();
-		final Integer tn = cm.getTrueNegatives();
-		final Integer fp = cm.getFalsePositives();
-		final Integer fn = cm.getFalseNegatives();
+	public Eval(final ConfusionMatrix confusionMatrix) {
+		this.matrices    = Arrays.asList(Objects.requireNonNull(confusionMatrix));
+		final Integer tp = confusionMatrix.getTruePositives();
+		final Integer tn = confusionMatrix.getTrueNegatives();
+		final Integer fp = confusionMatrix.getFalsePositives();
+		final Integer fn = confusionMatrix.getFalseNegatives();
 
 		this.recall    = (tp + fn) != 0 ? (1.0 * tp) / (tp + fn) : 0.0;
 		this.precision = (tp + fp) != 0 ? (1.0 * tp) / (tp + fp) : 0.0;
@@ -24,26 +29,37 @@ public class Eval {
 	}
 
 	public Eval(final List<Eval> evals) {
-		Objects.requireNonNull(evals);
+		this.matrices  = Objects.requireNonNull(evals).stream().flatMap(e -> e.getMatrices().stream()).collect(Collectors.toList());
 		this.accuracy  = evals.stream().mapToDouble(Eval::getAccuracy).average().orElse(0.0);
 		this.precision = evals.stream().mapToDouble(Eval::getPrecision).average().orElse(0.0);
 		this.recall    = evals.stream().mapToDouble(Eval::getRecall).average().orElse(0.0);
 		this.fscore    = evals.stream().mapToDouble(Eval::getFscore).average().orElse(0.0);
 	}
 
-	public Double getRecall() {
-		return recall;
-	}
-
-	public Double getPrecision() {
-		return precision;
+	public List<ConfusionMatrix> getMatrices() {
+		return matrices;
 	}
 
 	public Double getAccuracy() {
 		return accuracy;
 	}
 
+	public Double getPrecision() {
+		return precision;
+	}
+
+	public Double getRecall() {
+		return recall;
+	}
+
 	public Double getFscore() {
 		return fscore;
 	}
+
+	@Override
+	public String toString() {
+		return getAccuracy() + ", " + getRecall() + ", " + getPrecision() + ", " + getFscore()
+		       + "\n" + getMatrices();
+	}
+
 }

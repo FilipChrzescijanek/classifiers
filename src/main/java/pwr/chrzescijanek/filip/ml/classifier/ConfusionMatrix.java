@@ -44,7 +44,7 @@ public class ConfusionMatrix {
 	
 	@Override
 	public String toString() {
-		return "[" + truePositives + ", " + trueNegatives + ", " + falsePositives + ", " + falseNegatives + "]";
+		return "[[" + truePositives + ", " + falsePositives + "], [" + falseNegatives + ", " + trueNegatives + "]]";
 	}
 
 }

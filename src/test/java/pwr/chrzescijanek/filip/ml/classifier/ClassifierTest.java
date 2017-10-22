@@ -11,8 +11,7 @@ import pwr.chrzescijanek.filip.ml.data.discretizer.EntropyDiscretizer;
 import pwr.chrzescijanek.filip.ml.data.discretizer.RangeDiscretizer;
 
 import java.io.IOException;
-
-import static org.junit.Assert.*;
+import java.util.Objects;
 
 public class ClassifierTest {
 
@@ -36,18 +35,14 @@ public class ClassifierTest {
 		final Integer folds      = 10;
 		final String dataSet     = "/iris.csv";
 
-		checkResults(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(), folds));
-		checkResults(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new RangeDiscretizer()), folds));
-		checkResults(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new CardinalityDiscretizer()), folds));
-		checkResults(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new EntropyDiscretizer()), folds));
+		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(), folds));
+		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new RangeDiscretizer()), folds));
+		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new CardinalityDiscretizer()), folds));
+		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new EntropyDiscretizer()), folds));
 	}
 
-	private void checkResults(final Eval e) {
-		assertNotNull(e);
-		System.out.println(e.getAccuracy() + ", "
-		                   + e.getRecall() + ", "
-		                   + e.getPrecision() + ", "
-		                   + e.getFscore());
+	private void print(final Eval e) {
+		System.out.println(Objects.requireNonNull(e));
 	}
 
 }

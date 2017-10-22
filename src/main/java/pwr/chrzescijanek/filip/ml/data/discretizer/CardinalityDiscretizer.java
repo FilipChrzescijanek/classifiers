@@ -9,7 +9,7 @@ import pwr.chrzescijanek.filip.ml.data.DataSet;
 public class CardinalityDiscretizer extends AbstractDiscretizer {
 
 	@Override
-	protected List<Bin> createBins(DataSet ds, final List<Double> column) {
+	protected List<Bin> createBins(final DataSet ds, final List<Double> column) {
 		final List<Bin> bins      = new ArrayList<>();
 		final List<Double> sorted = column.stream().sorted().collect(Collectors.toList());
 		
@@ -22,8 +22,8 @@ public class CardinalityDiscretizer extends AbstractDiscretizer {
 		for (int j = 0; j < noOfBins; j++) {
 			final Integer minIndex = separation * j;
 			final Integer maxIndex = separation * (j + 1) - 1;
-			final Double minValue = minIndex == 0        ? min : bins.get(j - 1).getMaxValue();
-			final Double maxValue = maxIndex >= size - 1 ? max : sorted.get(maxIndex);
+			final Double minValue = minIndex == 0        ? min.doubleValue() : bins.get(j - 1).getMaxValue();
+			final Double maxValue = maxIndex >= size - 1 ? max.doubleValue() : sorted.get(maxIndex);
 			bins.add(new Bin(minValue, maxValue));
 		}
 		
