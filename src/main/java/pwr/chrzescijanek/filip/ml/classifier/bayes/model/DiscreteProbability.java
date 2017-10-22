@@ -8,24 +8,29 @@ import java.util.stream.Collectors;
 
 public class DiscreteProbability implements ProbabilityProvider {
 	
-	private Map<String, Double> probabilities;
-	
-	public DiscreteProbability(List<String> allValues) {
-		this.probabilities = Objects.requireNonNull(allValues).stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-				.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> (e.getValue() * 1.0) / allValues.size()));
-	}
-	
-	public Map<String, Double> getProbabilities() {
-		return probabilities;
-	}
+	private final Map<String, Double> probabilities;
 
+	public DiscreteProbability(final List<String> attributeValues, final List<String> allValues) {
+		Objects.requireNonNull(allValues);
+		this.probabilities = Objects.requireNonNull(attributeValues)
+		                            .stream()
+		                            .collect(Collectors.toMap(Function.identity(), v -> allValues.stream().filter(val -> val.equals(v)).count()))
+		                            .entrySet()
+		                            .stream()
+		                            .collect(Collectors.toMap(Map.Entry::getKey, e -> ((e.getValue() + 1) * 1.0) / (allValues.size() + attributeValues.size())));
+	}
+	
 	@Override
-	public Double getProbability(Object value) {
+	public Double getProbability(final Object value) {
 		if (!(value instanceof String)) {
 			throw new IllegalArgumentException();
 		}
-		String s = (String) value;
+		final String s = (String) value;
 		return getProbabilities().getOrDefault(s, 0.0);
+	}
+
+	public Map<String, Double> getProbabilities() {
+		return probabilities;
 	}
 
 }
