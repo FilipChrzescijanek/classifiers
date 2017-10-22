@@ -26,7 +26,7 @@ public class Bin  {
 	
 	@Override
 	public String toString() {
-		return String.format("%.2f - %.2f", minValue, maxValue);
+		return String.format("%.9f - %.9f", minValue, maxValue);
 	}
 
 }

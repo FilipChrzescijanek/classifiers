@@ -13,10 +13,10 @@ import pwr.chrzescijanek.filip.ml.data.record.Record;
 public class EntropyDiscretizer extends AbstractDiscretizer {
 
 	@Override
-	protected List<Bin> createBins(DataSet ds, List<Double> column) {
-		final Integer noOfBins = (int) Math.sqrt(column.size());
-		final Double max       = Math.ceil(column.stream().mapToDouble(Double::doubleValue).max().orElse(0.0));
-		final Double min       = Math.floor(column.stream().mapToDouble(Double::doubleValue).min().orElse(0.0));
+	protected List<Bin> createBins(final DataSet ds, final List<Double> column) {
+		final Integer noOfBins = findNoOfBins(column.size());
+		final Double max       = column.stream().mapToDouble(Double::doubleValue).max().orElse(0.0) + EPSILON;
+		final Double min       = column.stream().mapToDouble(Double::doubleValue).min().orElse(0.0) - EPSILON;
 		
 		final List<String> classes = ds.getRecords().stream().map(Record::getClazz).collect(Collectors.toList());
 		final List<Bin> bins       = new ArrayList<>();
@@ -26,7 +26,7 @@ public class EntropyDiscretizer extends AbstractDiscretizer {
 		return createBins(bins, noOfBins, column, classes);
 	}
 	
-	private List<Bin> createBins(List<Bin> bins, Integer noOfBins, List<Double> column, List<String> classes) {
+	private List<Bin> createBins(final List<Bin> bins, final Integer noOfBins, final List<Double> column, final List<String> classes) {
 		final BinsData allBinsInfo = processBins(bins, column, classes);
 		
 		final Map.Entry<Bin, Double> maxEntropyBin = getMaxEntropyBin(allBinsInfo);
@@ -40,7 +40,7 @@ public class EntropyDiscretizer extends AbstractDiscretizer {
 		return bins;
 	}
 
-	private BinsData processBins(List<Bin> bins, List<Double> values, List<String> classes) {
+	private BinsData processBins(final List<Bin> bins, final List<Double> values, final List<String> classes) {
 		final List<Bin> discreteValues = discretize(bins, values);
 		
 		final Map<Bin, Map<String, Integer>> binClassDistribution = getBinsClassDistribution(bins, classes, discreteValues);
@@ -50,7 +50,7 @@ public class EntropyDiscretizer extends AbstractDiscretizer {
 		return new BinsData(discreteValues, entropies);
 	}
 
-	private List<Bin> discretize(List<Bin> bins, List<Double> values) {
+	private List<Bin> discretize(final List<Bin> bins, final List<Double> values) {
 		final List<Bin> discreteValues = values
 				.stream()
 				.map(d -> bins.stream().filter(b -> b.contains(d)).findFirst().get())
@@ -58,15 +58,15 @@ public class EntropyDiscretizer extends AbstractDiscretizer {
 		return discreteValues;
 	}
 
-	private Map<Bin, Map<String, Integer>> getBinsClassDistribution(List<Bin> bins, List<String> classes,
-			final List<Bin> discreteValues) {
+	private Map<Bin, Map<String, Integer>> getBinsClassDistribution(final List<Bin> bins, final List<String> classes,
+	                                                                final List<Bin> discreteValues) {
 		final Map<Bin, Map<String, Integer>> binClasses = new HashMap<>();
 		
 		bins.forEach(b -> {
-			Map<String, Integer> classMap = new HashMap<>();
+			final Map<String, Integer> classMap = new HashMap<>();
 			for (int i = 0; i < discreteValues.size(); i++) {
 				if (discreteValues.get(i) == b) {
-					String current = classes.get(i);
+					final String current = classes.get(i);
 					classMap.put(current, classMap.getOrDefault(current, 0) + 1);
 				}
 			}
@@ -78,8 +78,8 @@ public class EntropyDiscretizer extends AbstractDiscretizer {
 
 	private Map<Bin, Double> getEntropies(final Map<Bin, Map<String, Integer>> binClassDistribution) {
 		final Map<Bin, Double> entropies = binClassDistribution.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> {
-			Map<String, Integer> m = e.getValue();
-			Integer binSize = m.values().stream().mapToInt(Integer::intValue).sum();
+			final Map<String, Integer> m = e.getValue();
+			final Integer binSize = m.values().stream().mapToInt(Integer::intValue).sum();
 			return binSize == 0 ? 0.0 : -m.entrySet().stream().mapToDouble(entry -> {
 				Double probability = (1.0 * entry.getValue()) / binSize;
 				return probability.equals(0.0) ? 0.0 : probability * Math.log(probability) / Math.log(2);
@@ -89,18 +89,18 @@ public class EntropyDiscretizer extends AbstractDiscretizer {
 	}
 	
 
-	private Map.Entry<Bin, Double> getMaxEntropyBin(BinsData allBinsInfo) {
-		Map<Bin, Double> allEntropies = allBinsInfo.getEntropies();
+	private Map.Entry<Bin, Double> getMaxEntropyBin(final BinsData allBinsInfo) {
+		final Map<Bin, Double> allEntropies = allBinsInfo.getEntropies();
 		final Map.Entry<Bin, Double> maxEntropy = allEntropies.entrySet()
 				.stream()
 				.max((e1, e2) -> e1.getValue().compareTo(e2.getValue())).get();
 		return maxEntropy;
 	}
 
-	private void split(List<Bin> bins, List<Double> column, List<String> classes, List<Bin> discreteValues,
-			final Map.Entry<Bin, Double> maxEntropy) {
-		List<Double> binValues = new ArrayList<>();
-		List<String> binClasses = new ArrayList<>();
+	private void split(final List<Bin> bins, final List<Double> column, final List<String> classes, final List<Bin> discreteValues,
+	                   final Map.Entry<Bin, Double> maxEntropy) {
+		final List<Double> binValues = new ArrayList<>();
+		final List<String> binClasses = new ArrayList<>();
 		
 		for (int i = 0; i < column.size(); i++) {
 			if (discreteValues.get(i) == maxEntropy.getKey()) {
@@ -109,57 +109,55 @@ public class EntropyDiscretizer extends AbstractDiscretizer {
 			}
 		}
 		
-		Double minValue = maxEntropy.getKey().getMinValue();
-		Double maxValue = maxEntropy.getKey().getMaxValue();
+		final Double minValue = maxEntropy.getKey().getMinValue();
+		final Double maxValue = maxEntropy.getKey().getMaxValue();
 		
-		List<Bin> bestSplit = chooseBestSplit(maxEntropy, minValue, maxValue, binValues, binClasses);
+		final List<Bin> bestSplit = chooseBestSplit(maxEntropy, minValue, maxValue, binValues, binClasses);
 		
 		bins.addAll(bestSplit);
 	}
 
-	private List<Bin> chooseBestSplit(final Map.Entry<Bin, Double> maxEntropy, Double minValue, Double maxValue,
-			List<Double> binValues, List<String> binClasses) {
-		Map<List<Bin>, Double> gains = new HashMap<>();
+	private List<Bin> chooseBestSplit(final Map.Entry<Bin, Double> maxEntropy, final Double minValue, final Double maxValue,
+	                                  final List<Double> binValues, final List<String> binClasses) {
+		final Map<List<Bin>, Double> gains = new HashMap<>();
 		
-		List<Double> sorted = binValues.stream().sorted().collect(Collectors.toList());
+		final List<Double> sorted = binValues.stream().sorted().collect(Collectors.toList());
 	
 		for (int i = 0; i < sorted.size() - 1; i++) {
-			Double splitValue = (sorted.get(i) + sorted.get(i + 1)) / 2.0;
-			List<Bin> newBinz = createBins(minValue, maxValue, splitValue);
-			Double gain = calculateGain(maxEntropy.getValue(), binValues, binClasses, newBinz);
+			final Double splitValue = (sorted.get(i) + sorted.get(i + 1)) / 2.0;
+			final List<Bin> newBinz = createBins(minValue, maxValue, splitValue);
+			final Double gain = calculateGain(maxEntropy.getValue(), binValues, binClasses, newBinz);
 			gains.put(newBinz, gain);
 		}
 		
-		List<Bin> bestSplit = gains.entrySet().stream().max((e1, e2) -> e1.getValue().compareTo(e2.getValue())).get().getKey();
-		return bestSplit;
+		return gains.entrySet().stream().max((e1, e2) -> e1.getValue().compareTo(e2.getValue())).get().getKey();
 	}
 
-	private List<Bin> createBins(Double minValue, Double maxValue, Double splitValue) {
-		List<Bin> binz = new ArrayList<>();
-		Bin firstBin = new Bin(minValue, splitValue); 
-		Bin secondBin = new Bin(splitValue, maxValue);
+	private List<Bin> createBins(final Double minValue, final Double maxValue, final Double splitValue) {
+		final List<Bin> binz = new ArrayList<>();
+		final Bin firstBin = new Bin(minValue, splitValue);
+		final Bin secondBin = new Bin(splitValue, maxValue);
 		binz.add(firstBin);
 		binz.add(secondBin);
 		return binz;
 	}
 
-	private Double calculateGain(Double maxEntropy, List<Double> binValues, List<String> binClasses, List<Bin> bins) {
-		BinsData binsInfo = processBins(bins, binValues, binClasses);
-		Map<Bin, Double> entropies = binsInfo.getEntropies();
-		Entry<Bin, Double> firstBinData  = entropies.entrySet().stream().filter(e -> e.getKey().equals(bins.get(0))).findFirst().get();
-		Entry<Bin, Double> secondBinData = entropies.entrySet().stream().filter(e -> e.getKey().equals(bins.get(1))).findFirst().get();
-		Double gain = gain(maxEntropy, info(firstBinData, secondBinData, binsInfo.getDiscreteValues()));
-		return gain;
+	private Double calculateGain(final Double maxEntropy, final List<Double> binValues, final List<String> binClasses, final List<Bin> bins) {
+		final BinsData binsInfo = processBins(bins, binValues, binClasses);
+		final Map<Bin, Double> entropies = binsInfo.getEntropies();
+		final Entry<Bin, Double> firstBinData  = entropies.entrySet().stream().filter(e -> e.getKey().equals(bins.get(0))).findFirst().get();
+		final Entry<Bin, Double> secondBinData = entropies.entrySet().stream().filter(e -> e.getKey().equals(bins.get(1))).findFirst().get();
+		return gain(maxEntropy, info(firstBinData, secondBinData, binsInfo.getDiscreteValues()));
 	}	
 	
-	private Double info(Entry<Bin, Double> firstBin, Entry<Bin, Double> secondBin, List<Bin> discreteValues) {
-		Double firstBinProbability  = discreteValues.stream().filter(b -> b.equals(firstBin .getKey())).count() / (discreteValues.size() * 1.0);
-		Double secondBinProbability = discreteValues.stream().filter(b -> b.equals(secondBin.getKey())).count() / (discreteValues.size() * 1.0);
+	private Double info(final Entry<Bin, Double> firstBin, final Entry<Bin, Double> secondBin, final List<Bin> discreteValues) {
+		final Double firstBinProbability  = discreteValues.stream().filter(b -> b.equals(firstBin.getKey())).count() / (discreteValues.size() * 1.0);
+		final Double secondBinProbability = discreteValues.stream().filter(b -> b.equals(secondBin.getKey())).count() / (discreteValues.size() * 1.0);
 		
 		return firstBinProbability * firstBin.getValue() + secondBinProbability * secondBin.getValue();
 	}
 	
-	private Double gain(Double maxEntropy, Double info) {
+	private Double gain(final Double maxEntropy, final Double info) {
 		return maxEntropy - info;
 	}
 	
@@ -167,7 +165,7 @@ public class EntropyDiscretizer extends AbstractDiscretizer {
 		private final List<Bin> discreteValues;
 		private final Map<Bin, Double> entropies;
 		
-		private BinsData(List<Bin> discreteValues, Map<Bin, Double> entropies) {
+		private BinsData(final List<Bin> discreteValues, final Map<Bin, Double> entropies) {
 			this.discreteValues = discreteValues;
 			this.entropies = entropies;
 		}

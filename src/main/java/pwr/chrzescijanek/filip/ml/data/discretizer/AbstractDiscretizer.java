@@ -10,33 +10,41 @@ import pwr.chrzescijanek.filip.ml.data.record.Record;
 
 public abstract class AbstractDiscretizer implements Discretizer {
 
+	public static final Double EPSILON = 0.000000001;
+
 	@Override
-	public DataSet discretize(DataSet ds) {
+	public DataSet discretize(final DataSet ds) {
 		final List<ContinuousAttribute> continuousAttributes = ds.getAttributes()
 				.stream()
 				.filter(a -> !a.isDiscrete())
 				.map(a -> (ContinuousAttribute) a)
 				.collect(Collectors.toList());
 		
-		List<List<Object>> values = ds.getRecords().stream().map(r -> new ArrayList<>(r.getValues())).collect(Collectors.toList());
-		List<Record> records = updateRecords(ds, continuousAttributes, values);
-		List<String> attributeNames = ds.getAttributeNames();
-		List<String> attributeTypes = ds.getAttributes().stream().map(a -> "d").collect(Collectors.toList());
+		final List<List<Object>> values   = ds.getRecords()
+		                                      .stream()
+		                                      .map(r -> new ArrayList<>(r.getValues()))
+		                                      .collect(Collectors.toList());
+		final List<Record> records        = updateRecords(ds, continuousAttributes, values);
+		final List<String> attributeNames = ds.getAttributeNames();
+		final List<String> attributeTypes = ds.getAttributes()
+		                                      .stream()
+		                                      .map(a -> "d")
+		                                      .collect(Collectors.toList());
 		return new DataSet(records, attributeNames, attributeTypes, ds.getClazz().getName());
 	}
 
-	private List<Record> updateRecords(DataSet ds, final List<ContinuousAttribute> attributes,
-			List<List<Object>> values) {
+	private List<Record> updateRecords(final DataSet ds, final List<ContinuousAttribute> attributes,
+	                                   final List<List<Object>> values) {
 		updateValues(ds, values, attributes);
-		List<Record> records = new ArrayList<>();
+		final List<Record> records = new ArrayList<>();
 		for (int i = 0; i < values.size(); i++) {
 			records.add(new Record(values.get(i), ds.getRecords().get(i).getClazz()));
 		}
 		return records;
 	}
 	
-	private void updateValues(DataSet ds, List<List<Object>> values, List<ContinuousAttribute> attributes) {
-		for (ContinuousAttribute attribute : attributes) {
+	private void updateValues(final DataSet ds, final List<List<Object>> values, final List<ContinuousAttribute> attributes) {
+		for (final ContinuousAttribute attribute : attributes) {
 			final int index = ds.getAttributes().indexOf(attribute);
 			
 			final List<Double> column    = ds.getValues(attribute);
@@ -51,6 +59,10 @@ public abstract class AbstractDiscretizer implements Discretizer {
 				values.get(i).set(index, discretized.get(i).toString());
 			}
 		}
+	}
+
+	protected Integer findNoOfBins(final Number breadth) {
+		return (int) Math.max(Math.round(Math.sqrt(breadth.doubleValue())), 1);
 	}
 	
 	protected abstract List<Bin> createBins(DataSet ds, List<Double> column);
