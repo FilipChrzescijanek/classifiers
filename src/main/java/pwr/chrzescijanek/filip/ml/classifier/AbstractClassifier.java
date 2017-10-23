@@ -25,7 +25,7 @@ public abstract class AbstractClassifier implements Classifier {
 	public Eval test(final TestDataSet tds) {
 		Objects.requireNonNull(tds);
 		tds.getRecords().forEach(this::assignClass);
-		return new Eval(tds.getConfusionMatrix());
+		return Eval.createFromMatrices(tds.getConfusionMatrices());
 	}
 
 	protected abstract void assignClass(TestRecord tr);
@@ -38,7 +38,7 @@ public abstract class AbstractClassifier implements Classifier {
 			final Fold f = it.next();
 			evals.add(train(f.getTrainingDataSet()).test(f.getTestDataSet()));
 		}
-		return new Eval(evals);
+		return Eval.createAverage(evals);
 	}
 
 }
