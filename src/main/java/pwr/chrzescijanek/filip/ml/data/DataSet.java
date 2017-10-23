@@ -20,8 +20,8 @@ public class DataSet {
 	private final List<? extends DataAttribute> attributes;
 	private final DiscreteAttribute clazz;
 
-	public DataSet(final List<Record> records, List<String> attributeNames, List<String> attributeTypes, 
-			final String className) {
+	public DataSet(final List<Record> records, final List<String> attributeNames, final List<String> attributeTypes,
+	               final String className) {
 		final List<String> classValues = records.stream().map(r -> r.getClazz()).collect(Collectors.toList());
 		
 		this.clazz = new DiscreteAttribute(className, classValues);		
@@ -41,37 +41,37 @@ public class DataSet {
 		return getAttributes().stream().map(a -> a.getName()).collect(Collectors.toList());
 	}
 	
-	public DataAttribute getAttributeByName(String name) {
+	public DataAttribute getAttributeByName(final String name) {
 		return getAttributes().stream().filter(a -> a.getName().equals(name)).findFirst().get();
 	}
 	
-	public List<Double> getValues(ContinuousAttribute attribute) {
+	public List<Double> getValues(final ContinuousAttribute attribute) {
 		final int index = attributes.indexOf(attribute);
 		return getRecords().stream().map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());
 	}
 	
-	public List<Double> getValuesForClass(ContinuousAttribute attribute, String clazz) {
+	public List<Double> getValuesForClass(final ContinuousAttribute attribute, final String clazz) {
 		final int index = attributes.indexOf(attribute);
 		return getRecords().stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());
 	}
 	
-	public List<String> getValues(DiscreteAttribute attribute) {
+	public List<String> getValues(final DiscreteAttribute attribute) {
 		final int index = attributes.indexOf(attribute);
 		return getRecords().stream().map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
 	}
 	
-	public List<String> getValuesForClass(DiscreteAttribute attribute, String clazz) {
+	public List<String> getValuesForClass(final DiscreteAttribute attribute, final String clazz) {
 		final int index = attributes.indexOf(attribute);
 		return getRecords().stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
 	}
 	
-	public Double getMean(ContinuousAttribute attribute, String clazz) {
+	public Double getMean(final ContinuousAttribute attribute, final String clazz) {
 		return getValuesForClass(attribute, clazz).stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
 	}
 	
-	public Double getStdDev(ContinuousAttribute attribute, String clazz) {
-		List<Double> values = getValuesForClass(attribute, clazz);
-		Double mean         = getMean(attribute, clazz);
+	public Double getStdDev(final ContinuousAttribute attribute, final String clazz) {
+		final List<Double> values = getValuesForClass(attribute, clazz);
+		final Double mean         = getMean(attribute, clazz);
 		
 		return Math.sqrt(values.stream().reduce(0.0, (a, b) -> a + Math.pow(b - mean, 2)) / (values.size() - 1));
 	}
@@ -84,16 +84,16 @@ public class DataSet {
 		return new FoldIterator(folds);
 	}
 
-	private List<DataAttribute> createAttributes(final List<Record> records, List<String> attributeNames,
-			List<String> attributeTypes) {
-		List<DataAttribute> attributes = new ArrayList<>();
+	private List<DataAttribute> createAttributes(final List<Record> records, final List<String> attributeNames,
+	                                             final List<String> attributeTypes) {
+		final List<DataAttribute> attributes = new ArrayList<>();
 		
 		for (int i = 0; i < attributeNames.size(); i++) {
 			final int index = i;
-			if ("c".equals(attributeTypes.get(i))) {
+			if (DataType.C.toString().toLowerCase().equals(attributeTypes.get(i))) {
 				final List<Double> values = records.stream().map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());      
 				attributes.add(new ContinuousAttribute(attributeNames.get(i), values));
-			} else if ("d".equals(attributeTypes.get(i))) {
+			} else if (DataType.D.toString().toLowerCase().equals(attributeTypes.get(i))) {
 				final List<String> values = records.stream().map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
 				attributes.add(new DiscreteAttribute(attributeNames.get(i), values));
 			} else {
@@ -123,8 +123,11 @@ public class DataSet {
 		public Fold next() {
 			final Integer foldSize = (getRecords().size() + folds - 1) / folds;
 			
-			List<String> attributeNames = getAttributeNames();
-			List<String> attributeTypes = getAttributes().stream().map(a -> a.isDiscrete() ? "d" : "c").collect(Collectors.toList());
+			final List<String> attributeNames = getAttributeNames();
+			final List<String> attributeTypes = getAttributes()
+					.stream()
+					.map(a -> a.isDiscrete() ? DataType.D.toString().toLowerCase() : DataType.C.toString().toLowerCase())
+					.collect(Collectors.toList());
 			
 			final List<Record> copy        = new ArrayList<>(getRecords());
 			final List<Record> testSublist = new ArrayList<>(copy.subList(position * foldSize, Math.min((position + 1) * foldSize, copy.size())));
@@ -133,8 +136,8 @@ public class DataSet {
 			
 			final List<TestRecord> testSet = testSublist.stream().map(r -> new TestRecord(r.getValues(), attributeNames, r.getClazz())).collect(Collectors.toList());
 			
-			DataSet trainingDataSet = new DataSet(copy, attributeNames, attributeTypes, getClazz().getName());
-			TestDataSet testDataSet = new TestDataSet(testSet, getClazz().getValues());
+			final DataSet trainingDataSet = new DataSet(copy, attributeNames, attributeTypes, getClazz().getName());
+			final TestDataSet testDataSet = new TestDataSet(testSet, getClazz().getValues());
 			
 			final Fold fold = new Fold(trainingDataSet, testDataSet);
 			position++;

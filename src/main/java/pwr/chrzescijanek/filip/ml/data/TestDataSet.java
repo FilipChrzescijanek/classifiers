@@ -14,7 +14,7 @@ public class TestDataSet {
 	private final List<TestRecord> records;
 	private final List<String> classValues;
 	
-	public TestDataSet(List<TestRecord> records, List<String> classValues) {
+	public TestDataSet(final List<TestRecord> records, final List<String> classValues) {
 		this.records     = Collections.unmodifiableList(Objects.requireNonNull(records));
 		this.classValues = Collections.unmodifiableList(Objects.requireNonNull(classValues));
 	}
@@ -27,7 +27,7 @@ public class TestDataSet {
 		return classValues;
 	}
 
-	public ConfusionMatrix getConfusionMatrix() {
+	public List<ConfusionMatrix> getConfusionMatrices() {
 		final List<ConfusionMatrix> matrices = new ArrayList<>();
 		for (final String s : getClassValues()) {
 			Integer truePositives  = 0;
@@ -51,7 +51,7 @@ public class TestDataSet {
 
 			matrices.add(new ConfusionMatrix(truePositives, trueNegatives, falsePositives, falseNegatives));
 		}
-		return new ConfusionMatrix(matrices);
+		return matrices;
 	}
 
 }

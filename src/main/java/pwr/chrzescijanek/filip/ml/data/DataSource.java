@@ -60,7 +60,7 @@ public class DataSource {
 	}
 
 	private void checkClassType(final String classType) {
-		if (!"d".equals(classType)) {
+		if (!DataType.D.toString().toLowerCase().equals(classType)) {
 			throw new IllegalArgumentException("Class attribute must have discrete values!");
 		}
 	}
@@ -85,9 +85,9 @@ public class DataSource {
 			final List<Object> values = new ArrayList<>();
 			final List<String> row = data.get(i);
 			for (int j = 0; j < row.size(); j++) {
-				if ("c".equals(attributeTypes.get(j))) {
+				if (DataType.C.toString().toLowerCase().equals(attributeTypes.get(j))) {
 					values.add(Double.parseDouble(row.get(j)));
-				} else if ("d".equals(attributeTypes.get(j))) {
+				} else if (DataType.D.toString().toLowerCase().equals(attributeTypes.get(j))) {
 					values.add(row.get(j));
 				} else {
 					throw new UnknownFormatConversionException("Unknown attribute type" + attributeTypes.get(i));

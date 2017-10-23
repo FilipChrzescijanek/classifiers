@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import pwr.chrzescijanek.filip.ml.data.DataSet;
+import pwr.chrzescijanek.filip.ml.data.DataType;
 import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
 import pwr.chrzescijanek.filip.ml.data.record.Record;
 
@@ -28,7 +29,7 @@ public abstract class AbstractDiscretizer implements Discretizer {
 		final List<String> attributeNames = ds.getAttributeNames();
 		final List<String> attributeTypes = ds.getAttributes()
 		                                      .stream()
-		                                      .map(a -> "d")
+		                                      .map(a -> DataType.D.toString().toLowerCase())
 		                                      .collect(Collectors.toList());
 		return new DataSet(records, attributeNames, attributeTypes, ds.getClazz().getName());
 	}
