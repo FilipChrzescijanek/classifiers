@@ -1,33 +1,37 @@
 package pwr.chrzescijanek.filip.ml.classifier;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Eval {
 
-	private final List<ConfusionMatrix> matrices;
-
+	private final double[][] classMatrix;
+	private final List<String> classValues;
+	
 	private final Double accuracy;
 	private final Double precision;
 	private final Double recall;
 	private final Double fscore;
 
-	private Eval(final List<ConfusionMatrix> matrices, final Double accuracy, final Double precision, final Double recall, final Double fscore) {
-		this.matrices  = Objects.requireNonNull(matrices);
-		this.accuracy  = accuracy;
-		this.precision = precision;
-		this.recall    = recall;
-		this.fscore    = fscore;
+	private Eval(final Double accuracy, final Double precision, final Double recall, final Double fscore, 
+			final double[][] classMatrix, final List<String> classValues) {
+		this.accuracy    = accuracy;
+		this.precision   = precision;
+		this.recall      = recall;
+		this.fscore      = fscore;
+		this.classMatrix = classMatrix;
+		this.classValues = classValues;
 	}
 
-	public static Eval createFromMatrices(final List<ConfusionMatrix> matrices) {
+	public static Eval createFromMatrices(final List<ConfusionMatrix> matrices, final double[][] classMatrix, final List<String> classValues) {
 		Double accuracy  = 0.0;
 		Double precision = 0.0;
 		Double recall    = 0.0;
 		Double fscore    = 0.0;
 
-		for (final ConfusionMatrix cm : matrices) {
+		for (final ConfusionMatrix cm : Objects.requireNonNull(matrices)) {
 			final Double tp = cm.getTruePositives();
 			final Double tn = cm.getTrueNegatives();
 			final Double fp = cm.getFalsePositives();
@@ -43,23 +47,24 @@ public class Eval {
 		}
 
 		final Integer size = matrices.size();
-		return new Eval(matrices, accuracy / size, precision / size, recall / size, fscore / size);
+		return new Eval(accuracy / size, precision / size, recall / size, fscore / size, classMatrix, classValues);
 	}
 
 	public static Eval createAverage(final List<Eval> evals) {
-		final List<ConfusionMatrix> matrices  = Objects.requireNonNull(evals)
-		                                               .stream()
-		                                               .map(e -> new ConfusionMatrix(e.getMatrices()))
-		                                               .collect(Collectors.toList());
 		final Double accuracy  = evals.stream().mapToDouble(Eval::getAccuracy).average().orElse(0.0);
 		final Double precision = evals.stream().mapToDouble(Eval::getPrecision).average().orElse(0.0);
 		final Double recall    = evals.stream().mapToDouble(Eval::getRecall).average().orElse(0.0);
 		final Double fscore    = evals.stream().mapToDouble(Eval::getFscore).average().orElse(0.0);
-		return new Eval(matrices, accuracy, precision, recall, fscore);
-	}
-
-	public List<ConfusionMatrix> getMatrices() {
-		return matrices;
+		int length = evals.get(0).getClassMatrix().length;
+		final double[][] classMatrix = new double[length][length];
+		for (Eval e : evals) {
+			for (int i = 0; i < length; i++) {
+				for (int j = 0; j < length; j++) {
+					classMatrix[i][j] += e.getClassMatrix()[i][j];
+				}
+			}
+		}
+		return new Eval(accuracy, precision, recall, fscore, classMatrix, evals.get(0).getClassValues());
 	}
 
 	public Double getAccuracy() {
@@ -77,10 +82,19 @@ public class Eval {
 	public Double getFscore() {
 		return fscore;
 	}
+	
+	public double[][] getClassMatrix() {
+		return classMatrix;
+	}
+
+	public List<String> getClassValues() {
+		return classValues;
+	}
 
 	@Override
 	public String toString() {
-		return String.format("[%.3f, %.3f, %.3f, %.3f]\n%s", getAccuracy(), getRecall(), getPrecision(), getFscore(), getMatrices());
+		return String.format("[%.3f, %.3f, %.3f, %.3f]\n%s\n%s", 
+				getAccuracy(), getRecall(), getPrecision(), getFscore(), Arrays.deepToString(getClassMatrix()), getClassValues());
 	}
 
 }

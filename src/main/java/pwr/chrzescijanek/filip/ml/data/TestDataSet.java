@@ -26,6 +26,19 @@ public class TestDataSet {
 	public List<String> getClassValues() {
 		return classValues;
 	}
+	
+	public double[][] getClassMatrix() {
+		int size = classValues.size();
+		double[][] classMatrix = new double[size][size];
+		for (final TestRecord tr : getRecords()) {
+			String assignedClass = tr.getAssignedClazz();
+			String trueClass     = tr.getClazz();
+			if (!Classifier.NULL_CLASS.equals(assignedClass)) {
+				classMatrix[getClassValues().indexOf(assignedClass)][getClassValues().indexOf(trueClass)] += 1.0;
+			}
+		}
+		return classMatrix;
+	}
 
 	public List<ConfusionMatrix> getConfusionMatrices() {
 		final List<ConfusionMatrix> matrices = new ArrayList<>();
