@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UnknownFormatConversionException;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
 import pwr.chrzescijanek.filip.ml.data.attribute.DataAttribute;
@@ -106,23 +107,21 @@ public class DataSet {
 
 	private class FoldIterator implements Iterator<Fold> {
 
-		private final Integer folds;
-		private Integer position;
+		private final Integer foldSize;
+		private final List<Record> leftToTest;
 
 		FoldIterator(final Integer folds) {
-			this.folds = Objects.requireNonNull(folds);
-			this.position = 0;
+			this.foldSize   = (getRecords().size() + folds - 1) / Objects.requireNonNull(folds);
+			this.leftToTest = new ArrayList<>(getRecords());
 		}
 
 		@Override
 		public boolean hasNext() {
-			return position < folds;
+			return !leftToTest.isEmpty();
 		}
 
 		@Override
 		public Fold next() {
-			final Integer foldSize = (getRecords().size() + folds - 1) / folds;
-			
 			final List<String> attributeNames = getAttributeNames();
 			final List<String> attributeTypes = getAttributes()
 					.stream()
@@ -130,7 +129,10 @@ public class DataSet {
 					.collect(Collectors.toList());
 			
 			final List<Record> copy        = new ArrayList<>(getRecords());
-			final List<Record> testSublist = new ArrayList<>(copy.subList(position * foldSize, Math.min((position + 1) * foldSize, copy.size())));
+			final List<Record> testSublist = IntStream
+					.range(0, Math.min(foldSize, leftToTest.size()))
+					.mapToObj(i -> leftToTest.remove((int) (Math.random() * leftToTest.size())))
+					.collect(Collectors.toList());
 			
 			copy.removeAll(testSublist);
 			
@@ -140,7 +142,6 @@ public class DataSet {
 			final TestDataSet testDataSet = new TestDataSet(testSet, getClazz().getValues());
 			
 			final Fold fold = new Fold(trainingDataSet, testDataSet);
-			position++;
 			return fold;
 		}
 	}
