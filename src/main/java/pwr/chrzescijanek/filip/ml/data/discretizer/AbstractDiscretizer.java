@@ -26,8 +26,8 @@ public abstract class AbstractDiscretizer implements Discretizer {
 		                                      .stream()
 		                                      .map(r -> new ArrayList<>(r.getRawValues()))
 		                                      .collect(Collectors.toList());
-		final List<Record> records        = updateRecords(ds, continuousAttributes, values);
 		final List<String> attributeNames = ds.getAttributeNames();
+		final List<Record> records        = updateRecords(ds, continuousAttributes, attributeNames, values);
 		final List<String> attributeTypes = ds.getAttributes()
 		                                      .stream()
 		                                      .map(a -> DataType.D.toString().toLowerCase())
@@ -36,12 +36,8 @@ public abstract class AbstractDiscretizer implements Discretizer {
 	}
 
 	private List<Record> updateRecords(final DataSet ds, final List<ContinuousAttribute> attributes,
-	                                   final List<List<Object>> values) {
+	                                   final List<String> attributeNames, final List<List<Object>> values) {
 		updateValues(ds, values, attributes);
-		final List<String> attributeNames = attributes
-				.stream()
-				.map(DataAttribute::getName)
-				.collect(Collectors.toList());
 		
 		final List<Record> records = new ArrayList<>();
 		for (int i = 0; i < values.size(); i++) {
