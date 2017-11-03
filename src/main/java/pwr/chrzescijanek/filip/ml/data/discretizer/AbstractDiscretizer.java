@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import pwr.chrzescijanek.filip.ml.data.DataSet;
 import pwr.chrzescijanek.filip.ml.data.DataType;
 import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
+import pwr.chrzescijanek.filip.ml.data.attribute.DataAttribute;
 import pwr.chrzescijanek.filip.ml.data.record.Record;
 
 public abstract class AbstractDiscretizer implements Discretizer {
@@ -23,7 +24,7 @@ public abstract class AbstractDiscretizer implements Discretizer {
 		
 		final List<List<Object>> values   = ds.getRecords()
 		                                      .stream()
-		                                      .map(r -> new ArrayList<>(r.getValues()))
+		                                      .map(r -> new ArrayList<>(r.getRawValues()))
 		                                      .collect(Collectors.toList());
 		final List<Record> records        = updateRecords(ds, continuousAttributes, values);
 		final List<String> attributeNames = ds.getAttributeNames();
@@ -37,9 +38,14 @@ public abstract class AbstractDiscretizer implements Discretizer {
 	private List<Record> updateRecords(final DataSet ds, final List<ContinuousAttribute> attributes,
 	                                   final List<List<Object>> values) {
 		updateValues(ds, values, attributes);
+		final List<String> attributeNames = attributes
+				.stream()
+				.map(DataAttribute::getName)
+				.collect(Collectors.toList());
+		
 		final List<Record> records = new ArrayList<>();
 		for (int i = 0; i < values.size(); i++) {
-			records.add(new Record(values.get(i), ds.getRecords().get(i).getClazz()));
+			records.add(new Record(values.get(i), attributeNames, ds.getRecords().get(i).getClazz()));
 		}
 		return records;
 	}

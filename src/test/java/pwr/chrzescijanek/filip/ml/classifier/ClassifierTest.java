@@ -17,25 +17,27 @@ public class ClassifierTest {
 
 	@Test
 	public void bayes() throws Exception {
-		testCrossValidation(new Bayes());
+		testCrossValidation(new Bayes(), false);
 	}
 
 	@Test
 	public void knn() throws Exception {
-		testCrossValidation(new KNearestNeighbors());
+		testCrossValidation(new KNearestNeighbors(), false);
 	}
 
 	@Test
 	public void ila() throws Exception {
-		testCrossValidation(new InductiveLearning());
+		testCrossValidation(new InductiveLearning(), true);
 	}
 
-	private void testCrossValidation(final Classifier c) throws IOException {
+	private void testCrossValidation(final Classifier c, final Boolean onlyDiscrete) throws IOException {
 		final Integer classIndex = 0;
 		final Integer folds      = 10;
 		final String dataSet     = getClass().getResource("/iris.csv").getPath();
 
-		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(), folds));
+		if (!onlyDiscrete) {
+			print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(), folds));
+		}
 		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new RangeDiscretizer()), folds));
 		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new CardinalityDiscretizer()), folds));
 		print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new EntropyDiscretizer()), folds));

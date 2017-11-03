@@ -49,7 +49,7 @@ public class TestDataSet {
 			Integer falseNegatives = 0;
 
 			for (final TestRecord tr : getRecords()) {
-				if (!Classifier.NULL_CLASS.equals(tr.getAssignedClazz())) {
+//				if (!Classifier.NULL_CLASS.equals(tr.getAssignedClazz())) {
 					if (tr.getClazz().equals(s) && tr.getClazz().equals(tr.getAssignedClazz())) {
 						truePositives++;
 					} else if (tr.getClazz().equals(s)) {
@@ -59,7 +59,7 @@ public class TestDataSet {
 					} else {
 						trueNegatives++;
 					}
-				}
+//				}
 			}
 
 			matrices.add(new ConfusionMatrix(truePositives, trueNegatives, falsePositives, falseNegatives));

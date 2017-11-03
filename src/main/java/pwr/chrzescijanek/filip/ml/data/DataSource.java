@@ -40,7 +40,7 @@ public class DataSource {
 			final String classType = attributeTypes.remove(getClassIndex().intValue());
 			checkClassType(classType);
 			
-			final List<Record> records = processData(lines, attributeTypes);
+			final List<Record> records = processData(lines, attributeNames, attributeTypes);
 			
 			final DataSet dataSet = new DataSet(records, attributeNames, attributeTypes, className);
 		
@@ -65,7 +65,7 @@ public class DataSource {
 		}
 	}
 
-	private List<Record> processData(final List<String> lines, final List<String> attributeTypes) {
+	private List<Record> processData(final List<String> lines, final List<String> attributeNames, final List<String> attributeTypes) {
 		final List<List<String>> data = lines
 				.stream()
 				.map(l -> new ArrayList<>(Arrays.asList(l.split("\\s*,\\s*"))))
@@ -74,11 +74,11 @@ public class DataSource {
 		final List<String> classValues = new ArrayList<>();
 		data.forEach(row -> classValues.add(row.remove(getClassIndex().intValue())));
 		
-		final List<Record> records = createRecords(attributeTypes, data, classValues);
+		final List<Record> records = createRecords(attributeTypes, attributeNames, data, classValues);
 		return records;
 	}
 
-	private List<Record> createRecords(final List<String> attributeTypes, final List<List<String>> data,
+	private List<Record> createRecords(final List<String> attributeTypes, final List<String> attributeNames, final List<List<String>> data,
 			final List<String> classValues) {
 		final List<Record> records = new ArrayList<>();
 		for (int i = 0; i < data.size(); i++) {
@@ -93,7 +93,7 @@ public class DataSource {
 					throw new UnknownFormatConversionException("Unknown attribute type" + attributeTypes.get(i));
 				}
 			}
-			records.add(new Record(values, classValues.get(i)));
+			records.add(new Record(values, attributeNames, classValues.get(i)));
 		}
 		return records;
 	}

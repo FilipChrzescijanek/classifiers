@@ -48,22 +48,22 @@ public class DataSet {
 	
 	public List<Double> getValues(final ContinuousAttribute attribute) {
 		final int index = attributes.indexOf(attribute);
-		return getRecords().stream().map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());
+		return getRecords().stream().map(r -> (Double) r.getRawValues().get(index)).collect(Collectors.toList());
 	}
 	
 	public List<Double> getValuesForClass(final ContinuousAttribute attribute, final String clazz) {
 		final int index = attributes.indexOf(attribute);
-		return getRecords().stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());
+		return getRecords().stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (Double) r.getRawValues().get(index)).collect(Collectors.toList());
 	}
 	
 	public List<String> getValues(final DiscreteAttribute attribute) {
 		final int index = attributes.indexOf(attribute);
-		return getRecords().stream().map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
+		return getRecords().stream().map(r -> (String) r.getRawValues().get(index)).collect(Collectors.toList());
 	}
 	
 	public List<String> getValuesForClass(final DiscreteAttribute attribute, final String clazz) {
 		final int index = attributes.indexOf(attribute);
-		return getRecords().stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
+		return getRecords().stream().filter(r -> r.getClazz().equals(clazz)).map(r -> (String) r.getRawValues().get(index)).collect(Collectors.toList());
 	}
 	
 	public Double getMean(final ContinuousAttribute attribute, final String clazz) {
@@ -92,10 +92,10 @@ public class DataSet {
 		for (int i = 0; i < attributeNames.size(); i++) {
 			final int index = i;
 			if (DataType.C.toString().toLowerCase().equals(attributeTypes.get(i))) {
-				final List<Double> values = records.stream().map(r -> (Double) r.getValues().get(index)).collect(Collectors.toList());      
+				final List<Double> values = records.stream().map(r -> (Double) r.getRawValues().get(index)).collect(Collectors.toList());      
 				attributes.add(new ContinuousAttribute(attributeNames.get(i), values));
 			} else if (DataType.D.toString().toLowerCase().equals(attributeTypes.get(i))) {
-				final List<String> values = records.stream().map(r -> (String) r.getValues().get(index)).collect(Collectors.toList());
+				final List<String> values = records.stream().map(r -> (String) r.getRawValues().get(index)).collect(Collectors.toList());
 				attributes.add(new DiscreteAttribute(attributeNames.get(i), values));
 			} else {
 				throw new UnknownFormatConversionException("Unknown attribute type" + attributeTypes.get(i));
@@ -136,7 +136,7 @@ public class DataSet {
 			
 			copy.removeAll(testSublist);
 			
-			final List<TestRecord> testSet = testSublist.stream().map(r -> new TestRecord(r.getValues(), attributeNames, r.getClazz())).collect(Collectors.toList());
+			final List<TestRecord> testSet = testSublist.stream().map(r -> new TestRecord(r.getRawValues(), attributeNames, r.getClazz())).collect(Collectors.toList());
 			
 			final DataSet trainingDataSet = new DataSet(copy, attributeNames, attributeTypes, getClazz().getName());
 			final TestDataSet testDataSet = new TestDataSet(testSet, getClazz().getValues());
