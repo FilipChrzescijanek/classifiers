@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import pwr.chrzescijanek.filip.ml.data.DataSet;
 import pwr.chrzescijanek.filip.ml.data.DataType;
 import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
-import pwr.chrzescijanek.filip.ml.data.attribute.DataAttribute;
 import pwr.chrzescijanek.filip.ml.data.record.Record;
 
 public abstract class AbstractDiscretizer implements Discretizer {

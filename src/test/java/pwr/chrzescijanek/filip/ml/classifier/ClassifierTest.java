@@ -20,7 +20,7 @@ public class ClassifierTest {
 		testCrossValidation(new Bayes(), false);
 	}
 
-	@Test
+	@Test	
 	public void knn() throws Exception {
 		testCrossValidation(new KNearestNeighbors(), false);
 	}

@@ -19,6 +19,11 @@ public class AttributeValuePair {
 	public Object getValue() {
 		return value;
 	}
+	
+	@Override
+	public String toString() {
+		return attributeName + "=" + value.toString();
+	}
 
 	@Override
 	public int hashCode() {

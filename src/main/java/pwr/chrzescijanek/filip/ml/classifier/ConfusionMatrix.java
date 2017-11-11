@@ -18,14 +18,6 @@ public class ConfusionMatrix {
 		this.falseNegatives = Objects.requireNonNull(falseNegatives).doubleValue();
 	}
 
-	public ConfusionMatrix(final List<ConfusionMatrix> matrices) {
-		Objects.requireNonNull(matrices);
-		this.truePositives  = matrices.stream().mapToDouble(ConfusionMatrix::getTruePositives ).average().orElse(0);
-		this.trueNegatives  = matrices.stream().mapToDouble(ConfusionMatrix::getTrueNegatives ).average().orElse(0);
-		this.falsePositives = matrices.stream().mapToDouble(ConfusionMatrix::getFalsePositives).average().orElse(0);
-		this.falseNegatives = matrices.stream().mapToDouble(ConfusionMatrix::getFalseNegatives).average().orElse(0);
-	}
-
 	public Double getTruePositives() {
 		return truePositives;
 	}

@@ -2,7 +2,6 @@ package pwr.chrzescijanek.filip.ml.data.discretizer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import pwr.chrzescijanek.filip.ml.data.DataSet;
 
