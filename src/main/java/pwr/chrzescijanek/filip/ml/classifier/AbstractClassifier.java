@@ -33,12 +33,16 @@ public abstract class AbstractClassifier implements Classifier {
 	@Override
 	public Eval crossValidate(final DataSet ds, final Integer folds) {
 		final List<Eval> evals = new ArrayList<>();
-		final Iterator<Fold> it = Objects.requireNonNull(ds).foldIterator(Objects.requireNonNull(folds));
+		final Iterator<Fold> it = normalize(Objects.requireNonNull(ds)).foldIterator(Objects.requireNonNull(folds));
 		while(it.hasNext()) {
 			final Fold f = it.next();
 			evals.add(train(f.getTrainingDataSet()).test(f.getTestDataSet()));
 		}
 		return Eval.createAverage(evals);
+	}
+	
+	protected DataSet normalize(final DataSet ds) {
+		return ds;
 	}
 
 }

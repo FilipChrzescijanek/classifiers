@@ -1,5 +1,7 @@
 package pwr.chrzescijanek.filip.ml.classifier.knn;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -8,7 +10,11 @@ import java.util.stream.Collectors;
 import javafx.util.Pair;
 import pwr.chrzescijanek.filip.ml.classifier.AbstractClassifier;
 import pwr.chrzescijanek.filip.ml.data.DataSet;
+import pwr.chrzescijanek.filip.ml.data.DataType;
+import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
+import pwr.chrzescijanek.filip.ml.data.attribute.DataAttribute;
 import pwr.chrzescijanek.filip.ml.data.attribute.DiscreteAttribute;
+import pwr.chrzescijanek.filip.ml.data.discretizer.Bin;
 import pwr.chrzescijanek.filip.ml.data.record.Record;
 import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 
@@ -25,21 +31,69 @@ public class KNearestNeighbors extends AbstractClassifier {
 	}
 	
 	@Override
-	protected void buildModel(final DataSet tds) {
-		dataSet = minimalizeDifferences(tds);
+	protected void buildModel(final DataSet ds) {
+		dataSet = ds;
 	}
 
-	private DataSet minimalizeDifferences(DataSet tds) {
-		checkAttributes(tds);
-		return tds;
+	@Override
+	protected DataSet normalize(DataSet ds) {
+		checkAttributes(ds);
+		final List<String> attributeTypes = getAttributeTypes(ds);
+		final List<List<Object>> values   = getValues(ds);
+		
+		updateValues(ds, values);
+		
+		final List<Record> records = updateRecords(ds, values);
+		
+		return new DataSet(records, ds.getAttributeNames(), attributeTypes, ds.getClazz().getName());
 	}
 
-	private void checkAttributes(final DataSet tds) {
-		tds.getAttributes().forEach(a -> {
+	private void checkAttributes(final DataSet ds) {
+		ds.getAttributes().forEach(a -> {
 			if (a instanceof DiscreteAttribute) {
 				throw new IllegalArgumentException("Attributes must have continuous values!");
 			}
 		});
+	}
+
+	private List<String> getAttributeTypes(DataSet ds) {
+		final List<String> attributeTypes = ds.getAttributes()
+                .stream()
+                .map(a -> DataType.C.toString().toLowerCase())
+                .collect(Collectors.toList());
+		return attributeTypes;
+	}
+
+	private List<List<Object>> getValues(DataSet ds) {
+		final List<List<Object>> values = ds.getRecords()
+		                                      .stream()
+		                                      .map(r -> new ArrayList<>(r.getRawValues()))
+		                                      .collect(Collectors.toList());
+		return values;
+	}
+
+	private void updateValues(DataSet ds, final List<List<Object>> values) {
+		for (final DataAttribute attribute : ds.getAttributes()) {
+			final int index = ds.getAttributes().indexOf(attribute);
+			
+			final Double max = ds.getValues((ContinuousAttribute) attribute)
+					.stream()
+					.mapToDouble(Double::doubleValue)
+					.max()
+					.orElse(1.0);
+			
+			for (int i = 0; i < values.size(); i++) {
+				values.get(i).set(index, ((Double) values.get(i).get(index)) / max);
+			}
+		}
+	}
+
+	private List<Record> updateRecords(DataSet ds, final List<List<Object>> values) {
+		final List<Record> records = new ArrayList<>();
+		for (int i = 0; i < values.size(); i++) {
+			records.add(new Record(values.get(i), ds.getAttributeNames(), ds.getRecords().get(i).getClazz()));
+		}
+		return records;
 	}
 
 	@Override
