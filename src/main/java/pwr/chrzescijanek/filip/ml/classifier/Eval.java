@@ -1,6 +1,5 @@
 package pwr.chrzescijanek.filip.ml.classifier;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -101,9 +100,7 @@ public class Eval {
 
 	@Override
 	public String toString() {
-		return String.format("[%.3f, %.3f, %.3f, %.3f, %.3f]\n%s\n%s", 
-				getAccuracy(), getRecall(), getPrecision(), getFscore(), getFailureRate(), 
-				Arrays.deepToString(getClassMatrix()), getClassValues());
+		return String.format("%.3f, %.3f, %.3f, %.3f", getAccuracy(), getRecall(), getPrecision(), getFscore());
 	}
 
 }

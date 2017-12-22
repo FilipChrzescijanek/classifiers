@@ -2,9 +2,9 @@ package pwr.chrzescijanek.filip.ml.classifier.knn;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javafx.util.Pair;
@@ -14,20 +14,23 @@ import pwr.chrzescijanek.filip.ml.data.DataType;
 import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
 import pwr.chrzescijanek.filip.ml.data.attribute.DataAttribute;
 import pwr.chrzescijanek.filip.ml.data.attribute.DiscreteAttribute;
-import pwr.chrzescijanek.filip.ml.data.discretizer.Bin;
 import pwr.chrzescijanek.filip.ml.data.record.Record;
 import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 
 public class KNearestNeighbors extends AbstractClassifier {
 
 	private final Integer k;
-	private final BiFunction<TestRecord, Record, Double> function;
+	
+	private final BiFunction<TestRecord, Record, Double>       distance;
+	private final Function<List<Pair<String, Double>>, String> voting;
 
 	private DataSet dataSet;
 
-	public KNearestNeighbors(final Integer k, final BiFunction<TestRecord, Record, Double> function) {
-		this.k = Objects.requireNonNull(k);
-		this.function = Objects.requireNonNull(function);
+	public KNearestNeighbors(final Integer k, final BiFunction<TestRecord, Record, Double> function,
+			final Function<List<Pair<String, Double>>, String> voting) {
+		this.k        = Objects.requireNonNull(k);
+		this.distance = Objects.requireNonNull(function);
+		this.voting   = Objects.requireNonNull(voting);
 	}
 	
 	@Override
@@ -98,35 +101,13 @@ public class KNearestNeighbors extends AbstractClassifier {
 
 	@Override
 	protected void assignClass(final TestRecord tr) {
-		tr.setAssignedClazz(dataSet.getRecords()
+		List<Pair<String, Double>> voters = dataSet.getRecords()
 				.parallelStream()
-				.map(r -> new Pair<String, Double>(r.getClazz(), function.apply(tr, r)))
+				.map(r -> new Pair<String, Double>(r.getClazz(), distance.apply(tr, r)))
 				.sorted((p1, p2) -> p1.getValue().compareTo(p2.getValue()))
 				.limit(k)
-				.collect(Collectors.groupingBy(pair -> pair.getKey(), Collectors.counting()))
-				.entrySet()
-				.stream()
-				.max((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
-				.orElse(new NullEntry()).getKey());
-	}
-
-	private final class NullEntry implements Map.Entry<String, Long> {
-		
-		@Override
-		public String getKey() {
-			return null;
-		}
-
-		@Override
-		public Long getValue() {
-			return 0L;
-		}
-
-		@Override
-		public Long setValue(Long value) {
-			return 0L;
-		}
-		
+				.collect(Collectors.toList());
+		tr.setAssignedClazz(voting.apply(voters));
 	}
 
 }

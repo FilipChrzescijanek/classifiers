@@ -1,10 +1,5 @@
 package pwr.chrzescijanek.filip.ml.classifier.bayes.model;
 
-import pwr.chrzescijanek.filip.ml.data.DataSet;
-import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
-import pwr.chrzescijanek.filip.ml.data.attribute.DataAttribute;
-import pwr.chrzescijanek.filip.ml.data.attribute.DiscreteAttribute;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +8,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import pwr.chrzescijanek.filip.ml.data.DataSet;
+import pwr.chrzescijanek.filip.ml.data.attribute.ContinuousAttribute;
+import pwr.chrzescijanek.filip.ml.data.attribute.DataAttribute;
+import pwr.chrzescijanek.filip.ml.data.attribute.DiscreteAttribute;
 
 public class BayesModel {
 

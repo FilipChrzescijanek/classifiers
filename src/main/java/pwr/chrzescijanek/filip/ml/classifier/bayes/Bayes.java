@@ -1,16 +1,16 @@
 package pwr.chrzescijanek.filip.ml.classifier.bayes;
 
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import pwr.chrzescijanek.filip.ml.classifier.AbstractClassifier;
-import pwr.chrzescijanek.filip.ml.classifier.bayes.model.ClassAttributePair;
 import pwr.chrzescijanek.filip.ml.classifier.bayes.model.BayesModel;
+import pwr.chrzescijanek.filip.ml.classifier.bayes.model.ClassAttributePair;
 import pwr.chrzescijanek.filip.ml.classifier.bayes.model.ProbabilityProvider;
 import pwr.chrzescijanek.filip.ml.classifier.bayes.model.ZeroProbability;
 import pwr.chrzescijanek.filip.ml.data.DataSet;
 import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Bayes extends AbstractClassifier {
 

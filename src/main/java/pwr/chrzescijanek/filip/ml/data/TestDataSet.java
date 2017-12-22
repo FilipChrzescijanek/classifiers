@@ -1,13 +1,13 @@
 package pwr.chrzescijanek.filip.ml.data;
 
-import pwr.chrzescijanek.filip.ml.classifier.Classifier;
-import pwr.chrzescijanek.filip.ml.classifier.ConfusionMatrix;
-import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import pwr.chrzescijanek.filip.ml.classifier.Classifier;
+import pwr.chrzescijanek.filip.ml.classifier.ConfusionMatrix;
+import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 
 public class TestDataSet {
 
