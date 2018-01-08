@@ -22,13 +22,14 @@ import pwr.chrzescijanek.filip.ml.data.discretizer.RangeDiscretizer;
 import pwr.chrzescijanek.filip.ml.data.record.Record;
 import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 
-public class ClassifierTest {
+public class EvaluatorTest {
 
 	private static final double EPSILON = Math.pow(10, -9);
 	
 	@Test
 	public void bayes() throws Exception {
-		testCrossValidation(new Bayes(), false, false);
+		testCrossValidation(new MonoEvaluator(new Bayes()), false, false);
+		testCrossValidation(new PoliEvaluator(Arrays.asList(new Bayes(), new Bayes(), new Bayes())), false, false);
 	}
 
 	@Test	
@@ -96,7 +97,7 @@ public class ClassifierTest {
 			for (BiFunction<TestRecord, Record, Double> f : distanceFunctions) {
 				for (Integer k : kValues) {
 					System.out.println("k = " + k);
-					testCrossValidation(new KNearestNeighbors(k, f, votingFunctions.get(0)), dataSet, false, true);
+					testCrossValidation(new MonoEvaluator(new KNearestNeighbors(k, f, votingFunctions.get(0))), dataSet, false, true);
 				}
 			}
 			
@@ -104,7 +105,7 @@ public class ClassifierTest {
 			for (Function<List<Pair<String, Double>>, String> f : votingFunctions) {
 				for (Integer k : kValues) {
 					System.out.println("k = " + k);
-					testCrossValidation(new KNearestNeighbors(k, distanceFunctions.get(0), f), dataSet, false, true);
+					testCrossValidation(new MonoEvaluator(new KNearestNeighbors(k, distanceFunctions.get(0), f)), dataSet, false, true);
 				}
 			}
 		}
@@ -112,25 +113,25 @@ public class ClassifierTest {
 
 	@Test
 	public void ila() throws Exception {
-		testCrossValidation(new InductiveLearning(), true, false);
+		testCrossValidation(new MonoEvaluator(new InductiveLearning()), true, false);
 	}
 	
-	private void testCrossValidation(final Classifier c, final Boolean onlyDiscrete, final Boolean onlyContinuous) throws IOException {
-		testCrossValidation(c, "/iris.csv", onlyDiscrete, onlyContinuous);
+	private void testCrossValidation(final Evaluator e, final Boolean onlyDiscrete, final Boolean onlyContinuous) throws IOException {
+		testCrossValidation(e, "/iris.csv", onlyDiscrete, onlyContinuous);
 	}
 	
-	private void testCrossValidation(final Classifier c, final String dataSetPath, final Boolean onlyDiscrete, final Boolean onlyContinuous) throws IOException {
+	private void testCrossValidation(final Evaluator e, final String dataSetPath, final Boolean onlyDiscrete, final Boolean onlyContinuous) throws IOException {
 		final Integer classIndex = 0;
 		final Integer folds      = 10;
 		final String dataSet     = getClass().getResource(dataSetPath).getPath();
 
 		if (!onlyDiscrete) {
-			print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(), folds));
+			print(e.crossValidate(new DataSource(dataSet, classIndex).asDataSet(), folds));
 		}
 		if (!onlyContinuous) {
-			print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new RangeDiscretizer()), folds));
-			print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new CardinalityDiscretizer()), folds));
-			print(c.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new EntropyDiscretizer()), folds));
+			print(e.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new RangeDiscretizer()), folds));
+			print(e.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new CardinalityDiscretizer()), folds));
+			print(e.crossValidate(new DataSource(dataSet, classIndex).asDataSet(new EntropyDiscretizer()), folds));
 		}
 	}
 

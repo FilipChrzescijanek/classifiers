@@ -11,6 +11,4 @@ public interface Classifier {
 
 	Eval test(TestDataSet tds);
 
-	Eval crossValidate(DataSet ds, Integer folds);
-
 }

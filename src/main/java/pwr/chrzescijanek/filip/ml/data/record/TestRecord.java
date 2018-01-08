@@ -1,7 +1,6 @@
 package pwr.chrzescijanek.filip.ml.data.record;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import pwr.chrzescijanek.filip.ml.classifier.Classifier;
@@ -19,7 +18,7 @@ public class TestRecord extends Record {
 	}
 
 	public void setAssignedClazz(final String assignedClazz) {
-		this.assignedClazz = Objects.requireNonNull(assignedClazz);
+		this.assignedClazz = assignedClazz;
 	}
 
 }
