@@ -12,11 +12,11 @@ import pwr.chrzescijanek.filip.ml.data.DataSet;
 import pwr.chrzescijanek.filip.ml.data.Fold;
 import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 
-public class PoliEvaluator implements Evaluator {
+public class BaggingEvaluator implements Evaluator {
 	
 	private final List<AbstractClassifier> classifiers;
 	
-	public PoliEvaluator(List<AbstractClassifier> classifiers) {
+	public BaggingEvaluator(List<AbstractClassifier> classifiers) {
 		this.classifiers = Collections.unmodifiableList(Objects.requireNonNull(classifiers));
 		if (classifiers.isEmpty()) {
 			throw new IllegalArgumentException("There has to be at least one classifier!");
@@ -43,8 +43,7 @@ public class PoliEvaluator implements Evaluator {
 					if (!assignedClazz.equals(Classifier.NULL_CLASS)) {
 						votes.get(i).add(assignedClazz);
 						records.get(i).setAssignedClazz(null);
-					}
-				}
+					}				}
 			}
 			for (int i = 0; i < records.size(); i++) {
 				records.get(i).setAssignedClazz(votes.get(i).stream()

@@ -25,11 +25,23 @@ import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 public class EvaluatorTest {
 
 	private static final double EPSILON = Math.pow(10, -9);
+
+	@Test
+	public void ensemble() throws Exception {
+		System.out.println("Bagging v1:");
+		testCrossValidation(new BaggingEvaluator(Arrays.asList(new Bayes(), new InductiveLearning())), true, false);
+		System.out.println("Bagging v2:");
+		testCrossValidation(new BaggingEvaluator(Arrays.asList(new InductiveLearning(), new Bayes())), true, false);
+
+		System.out.println("Boosting v1:");
+		testCrossValidation(new BoostingEvaluator(Arrays.asList(new Bayes(), new InductiveLearning())), true, false);
+		System.out.println("Boosting v2:");
+		testCrossValidation(new BoostingEvaluator(Arrays.asList(new InductiveLearning(), new Bayes())), true, false);
+	}
 	
 	@Test
 	public void bayes() throws Exception {
 		testCrossValidation(new MonoEvaluator(new Bayes()), false, false);
-		testCrossValidation(new PoliEvaluator(Arrays.asList(new Bayes(), new Bayes(), new Bayes())), false, false);
 	}
 
 	@Test	
