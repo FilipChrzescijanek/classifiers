@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.Test;
 
@@ -28,15 +29,19 @@ public class EvaluatorTest {
 
 	@Test
 	public void ensemble() throws Exception {
-		System.out.println("Bagging v1:");
-		testCrossValidation(new BaggingEvaluator(Arrays.asList(new Bayes(), new InductiveLearning())), true, false);
-		System.out.println("Bagging v2:");
-		testCrossValidation(new BaggingEvaluator(Arrays.asList(new InductiveLearning(), new Bayes())), true, false);
+		System.out.println("Bagging (M = 3):");
+		testCrossValidation(new BaggingEvaluator(IntStream.range(0, 3).mapToObj(i -> new Bayes()).collect(Collectors.toList())), true, false);
+		System.out.println("Bagging (M = 5):");
+		testCrossValidation(new BaggingEvaluator(IntStream.range(0, 5).mapToObj(i -> new Bayes()).collect(Collectors.toList())), true, false);
+		System.out.println("Bagging (M = 10):");
+		testCrossValidation(new BaggingEvaluator(IntStream.range(0, 10).mapToObj(i -> new Bayes()).collect(Collectors.toList())), true, false);
 
-		System.out.println("Boosting v1:");
-		testCrossValidation(new BoostingEvaluator(Arrays.asList(new Bayes(), new InductiveLearning())), true, false);
-		System.out.println("Boosting v2:");
-		testCrossValidation(new BoostingEvaluator(Arrays.asList(new InductiveLearning(), new Bayes())), true, false);
+		System.out.println("Boosting (M = 3):");
+		testCrossValidation(new BoostingEvaluator(IntStream.range(0, 3).mapToObj(i -> new Bayes()).collect(Collectors.toList())), true, false);
+		System.out.println("Boosting (M = 5):");
+		testCrossValidation(new BoostingEvaluator(IntStream.range(0, 5).mapToObj(i -> new Bayes()).collect(Collectors.toList())), true, false);
+		System.out.println("Boosting (M = 10):");
+		testCrossValidation(new BoostingEvaluator(IntStream.range(0, 10).mapToObj(i -> new Bayes()).collect(Collectors.toList())), true, false);
 	}
 	
 	@Test

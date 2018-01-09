@@ -9,7 +9,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import pwr.chrzescijanek.filip.ml.data.DataSet;
+import pwr.chrzescijanek.filip.ml.data.DataType;
 import pwr.chrzescijanek.filip.ml.data.Fold;
+import pwr.chrzescijanek.filip.ml.data.record.Record;
 import pwr.chrzescijanek.filip.ml.data.record.TestRecord;
 
 public class BaggingEvaluator implements Evaluator {
@@ -37,7 +39,7 @@ public class BaggingEvaluator implements Evaluator {
 			List<TestRecord> records = f.getTestDataSet().getRecords();
 			records.forEach(r -> votes.add(new ArrayList<>()));
 			for (AbstractClassifier c : getClassifiers()) {
-				c.train(f.getTrainingDataSet()).test(f.getTestDataSet());
+				c.train(getRandomSample(f)).test(f.getTestDataSet());
 				for (int i = 0; i < records.size(); i++) {
 					String assignedClazz = records.get(i).getAssignedClazz();
 					if (!assignedClazz.equals(Classifier.NULL_CLASS)) {
@@ -56,6 +58,22 @@ public class BaggingEvaluator implements Evaluator {
 			evals.add(Eval.createFromDataSet(f.getTestDataSet()));
 		}
 		return Eval.createAverage(evals);
+	}
+
+	private DataSet getRandomSample(final Fold f) {
+		DataSet ids = f.getTrainingDataSet();
+		final List<String> attributeNames = ids.getAttributeNames();
+		final List<String> attributeTypes = ids.getAttributes()
+				.stream()
+				.map(a -> a.isDiscrete() ? DataType.D.toString().toLowerCase() : DataType.C.toString().toLowerCase())
+				.collect(Collectors.toList());
+		final List<Record> copy = new ArrayList<>();
+		List<Record> records = ids.getRecords();
+		for (int i = 0; i < records.size(); i++) {
+			copy.add(records.get((int) (Math.random() * records.size())));
+		}
+		final DataSet nds = new DataSet(copy, attributeNames, attributeTypes, ids.getClazz().getName());
+		return nds;
 	}
 
 }
